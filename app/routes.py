@@ -40,3 +40,6 @@ def sugestoes():
     
     return jsonify({'sugestoes': sugestoes_filtradas})
     
+    
+    
+#continuar com testes
