@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flask AJAX</title>
+</head>
+<body>
+    <div>
+        <h1>Cadastro de Nomes</h1>
+        <input type="text" id="nome" placeholder="Digite um nome">
+        <button onclick="salvarNome()">Salvar</button>
+        <button onclick="testar()">testar</button>
+    <div>
+    <br>
+    <br>
+    <br>
+    <br>
+
+    <div>
+        <input type="text" id="busca" placeholder="Digite para buscar..." onkeyup="buscarSugestoes()" autocomplete="off">
+        <di id='sugestoes'>
+        </div>
+    <div>
+
+    <ul id="lista-nomes"></ul>
+
+    <script>
+        function salvarNome() {
+            const nome = document.getElementById('nome').value;
+            fetch('/salvar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ nome })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'sucesso') {
+                    atualizarLista(data.nomes);
+                    document.getElementById('nome').value = '';
+                } else {
+                    alert(data.mensagem);
+                }
+            });
+        }
+
+        function atualizarLista(nomes) {
+            const ul = document.getElementById('lista-nomes');
+            ul.innerHTML = '';
+            nomes.forEach(nome => {
+                const li = document.createElement('li');
+                li.textContent = nome;
+                ul.appendChild(li);
+            });
+        }
+
+        function testar(){
+            const teste5 = "ping"; 
+            const teste2 = 'teste2';
+            fetch('/testar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ apagar : teste2 })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'sucesso') {
+                    const ul = document.getElementById('lista-nomes');
+                    const li = document.createElement('li');
+                    li.textContent = data.apagar;
+                    ul.appendChild(li);
+                    
+                } else {
+                    alert(data.mensagem);
+                }
+            });
+        }
+
+        function buscarSugestoes(){
+            const termo = document.getElementById('busca').value
+
+            if(termo.length < 1){
+                document.getElementById('sugestoes').innerHTML = '';
+                return;
+            }
+
+            fetch('/sugestoes?termo=' + encodeURIComponent(termo))
+                .then(res => res.json())
+                .then(data => {
+                    const div = document.getElementById('sugestoes')
+                    div.innerHTML = '';
+                    data.sugestoes.forEach(sugestao => {
+                        const p = document.createElement('p')
+                        p.textContent = sugestao;
+                        div.appendChild(p)
+                    })
+                })
+        }
+    </script>
+</body>
+</html>
